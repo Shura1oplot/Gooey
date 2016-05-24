@@ -15,6 +15,7 @@ from gooey.gui.windows.runtime_display_panel import RuntimeDisplay
 from gooey.gui import image_repository, events
 from gooey.gui.util import wx_util
 from gooey.gui.windows import footer, header, layouts
+from gooey.gui.windows.taskbar import Taskbar
 
 
 class BaseWindow(wx.Frame):
@@ -43,6 +44,8 @@ class BaseWindow(wx.Frame):
     self.registerControllers()
     self.Bind(wx.EVT_SIZE, self.onResize)
     self.Bind(wx.EVT_CLOSE, self.onClose)
+
+    self.taskbar = Taskbar(self.GetHandle())
 
   def _init_properties(self):
     self.SetTitle(self.build_spec['program_name'])
@@ -136,6 +139,7 @@ class BaseWindow(wx.Frame):
     self.layouts = locals()
 
   def load_view(self, view_name=None):
+    self.taskbar.setState("no_progress")
     self.layouts.get(view_name, lambda: None)()
 
   def ManualStart(self):
@@ -156,6 +160,7 @@ class BaseWindow(wx.Frame):
     pb = self.foot_panel.progress_bar
     if value < 0:
       pb.Pulse()
+      self.taskbar.setState("no_progress")
     else:
       value = min(int(value), pb.GetRange())
       if pb.GetValue() != value or value == 0:
@@ -169,6 +174,8 @@ class BaseWindow(wx.Frame):
           else:
             pb.SetValue(value+1)
         pb.SetValue(value)
+        self.taskbar.setState("normal")
+        self.taskbar.setValue(value)
 
 
 if __name__ == '__main__':
