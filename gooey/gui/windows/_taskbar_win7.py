@@ -27,6 +27,7 @@ class Taskbar(object):
 
     def __init__(self, hwnd):
         super(Taskbar, self).__init__()
+
         self.hwnd = hwnd
         self._last_state = None
 
@@ -37,6 +38,7 @@ class Taskbar(object):
     def setState(self, state):
         _taskbar.HrInit()
         _taskbar.SetProgressState(self.hwnd, self._states[state])
+        self._last_state = state
 
     def setValue(self, value, total=100):
         _taskbar.HrInit()
